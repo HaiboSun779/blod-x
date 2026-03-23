@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Feather } from "lucide-react"
 
@@ -37,10 +38,12 @@ export function Hero() {
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-          <Button size="lg" className="h-14 px-8 text-base font-semibold group">
-            Start Writing
-            <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
-          </Button>
+          <Link href="/auth/sign-up">
+            <Button size="lg" className="h-14 px-8 text-base font-semibold group">
+              Start Writing
+              <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </Link>
           <Button
             variant="outline"
             size="lg"
