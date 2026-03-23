@@ -39,6 +39,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      blogs: {
+        Row: {
+          author: string
+          author_id: string
+          content: string | null
+          created_at: string
+          id: string
+          image: string | null
+          slug: string
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author: string
+          author_id: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          image?: string | null
+          slug: string
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          author_id?: string
+          content?: string | null
+          created_at?: string
+          id?: string
+          image?: string | null
+          slug?: string
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

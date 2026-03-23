@@ -1,55 +1,54 @@
 import Link from "next/link"
-import { Calendar, Clock } from "lucide-react"
+import { Calendar } from "lucide-react"
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import type { Blog } from "@/types"
 
-export type BlogPost = {
-  id: string
-  title: string
-  excerpt: string
-  tag: string
-  date: string
-  readTime: string
-  status: "published" | "draft"
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
 }
 
-export function BlogCard({ post }: { post: BlogPost }) {
+function getExcerpt(content: string | null, maxLen = 120) {
+  if (!content) return "No content yet."
+  const text = content.replace(/<[^>]*>/g, "")
+  return text.length > maxLen ? text.slice(0, maxLen) + "..." : text
+}
+
+export function BlogCard({ blog }: { blog: Blog }) {
   return (
     <Card className="transition-shadow hover:shadow-md">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <Badge variant={post.status === "published" ? "default" : "secondary"}>
-            {post.status === "published" ? "Published" : "Draft"}
-          </Badge>
-          <span className="text-xs text-muted-foreground">{post.tag}</span>
-        </div>
         <CardTitle className="line-clamp-2">
-          <Link href={`/dashboard/blogs/${post.id}`} className="hover:underline">
-            {post.title}
+          <Link href={`/dashboard/blogs/${blog.slug}`} className="hover:underline">
+            {blog.title}
           </Link>
         </CardTitle>
+        {blog.subtitle && (
+          <CardDescription className="line-clamp-1">
+            {blog.subtitle}
+          </CardDescription>
+        )}
         <CardDescription className="line-clamp-2">
-          {post.excerpt}
+          {getExcerpt(blog.content)}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <Calendar className="size-3" />
-            <span>{post.date}</span>
+            <span>{formatDate(blog.created_at)}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Clock className="size-3" />
-            <span>{post.readTime}</span>
-          </div>
+          <span>by {blog.author}</span>
         </div>
       </CardContent>
     </Card>
