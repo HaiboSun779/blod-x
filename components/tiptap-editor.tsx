@@ -1,6 +1,6 @@
 "use client"
 
-import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react"
+import { useEditor, EditorContent } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Link from "@tiptap/extension-link"
 import {
@@ -26,6 +26,7 @@ interface TiptapEditorProps {
 
 export function TiptapEditor({ content = "", onChange }: TiptapEditorProps) {
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
@@ -181,41 +182,6 @@ export function TiptapEditor({ content = "", onChange }: TiptapEditorProps) {
           </Button>
         </div>
       </div>
-
-      {/* Bubble Menu */}
-      <BubbleMenu
-        editor={editor}
-        tippyOptions={{ duration: 100 }}
-        className="flex items-center gap-1 rounded-md border bg-background p-1 shadow-md"
-      >
-        <Button
-          type="button"
-          variant={editor.isActive("bold") ? "secondary" : "ghost"}
-          size="icon"
-          className="size-7"
-          onClick={() => editor.chain().focus().toggleBold().run()}
-        >
-          <Bold className="size-3.5" />
-        </Button>
-        <Button
-          type="button"
-          variant={editor.isActive("italic") ? "secondary" : "ghost"}
-          size="icon"
-          className="size-7"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-        >
-          <Italic className="size-3.5" />
-        </Button>
-        <Button
-          type="button"
-          variant={editor.isActive("link") ? "secondary" : "ghost"}
-          size="icon"
-          className="size-7"
-          onClick={setLink}
-        >
-          <LinkIcon className="size-3.5" />
-        </Button>
-      </BubbleMenu>
 
       {/* Editor content */}
       <EditorContent editor={editor} />
