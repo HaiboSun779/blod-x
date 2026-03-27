@@ -28,6 +28,17 @@ export async function getBlogs(): Promise<Blog[]> {
   return data ?? []
 }
 
+export async function getPublicBlogs(): Promise<Blog[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from("blogs")
+    .select("*")
+    .order("created_at", { ascending: false })
+
+  if (error) throw error
+  return data ?? []
+}
+
 export async function getBlogBySlug(slug: string): Promise<Blog | null> {
   const supabase = await createClient()
   const { data, error } = await supabase

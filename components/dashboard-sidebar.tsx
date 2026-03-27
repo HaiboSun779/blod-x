@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, FileText, Settings, User } from "lucide-react"
+import { Home, FileText, Settings, User, ExternalLink } from "lucide-react"
 
 import {
   Sidebar,
@@ -20,6 +20,7 @@ import {
 const navItems = [
   { title: "Home", href: "/dashboard", icon: Home },
   { title: "Blogs", href: "/dashboard/blogs", icon: FileText },
+  { title: "Public Page", href: "/blogs", icon: ExternalLink, external: true },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
@@ -63,8 +64,8 @@ export function DashboardSidebar() {
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
-                    render={<Link href={item.href} />}
-                    isActive={pathname === item.href}
+                    render={<Link href={item.href} target={item.external ? "_blank" : undefined} />}
+                    isActive={!item.external && pathname === item.href}
                     tooltip={item.title}
                   >
                     <item.icon />

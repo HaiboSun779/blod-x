@@ -24,12 +24,28 @@ function getExcerpt(content: string | null, maxLen = 120) {
   return text.length > maxLen ? text.slice(0, maxLen) + "..." : text
 }
 
-export function BlogCard({ blog }: { blog: Blog }) {
+interface BlogCardProps {
+  blog: Blog
+  basePath?: string
+}
+
+export function BlogCard({ blog, basePath = "/dashboard/blogs" }: BlogCardProps) {
   return (
-    <Card className="transition-shadow hover:shadow-md">
-      <CardHeader>
-        <CardTitle className="line-clamp-2">
-          <Link href={`/dashboard/blogs/${blog.slug}`} className="hover:underline">
+    <Card className="group transition-all hover:shadow-md">
+      {blog.image && (
+        <Link href={`${basePath}/${blog.slug}`}>
+          <div className="overflow-hidden rounded-t-lg">
+            <img
+              src={blog.image}
+              alt={blog.title}
+              className="aspect-[16/9] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
+        </Link>
+      )}
+      <CardHeader className={blog.image ? "pt-4" : ""}>
+        <CardTitle className="line-clamp-2 text-lg">
+          <Link href={`${basePath}/${blog.slug}`} className="hover:underline">
             {blog.title}
           </Link>
         </CardTitle>
@@ -54,3 +70,5 @@ export function BlogCard({ blog }: { blog: Blog }) {
     </Card>
   )
 }
+
+export { formatDate, getExcerpt }

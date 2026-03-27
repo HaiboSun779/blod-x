@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TiptapEditor } from "@/components/tiptap-editor"
+import { ImageUpload } from "@/components/image-upload"
 import { createBlog, updateBlog } from "@/lib/actions/blog"
 import type { Blog } from "@/types"
 
@@ -17,6 +18,7 @@ interface BlogFormProps {
 export function BlogForm({ blog }: BlogFormProps) {
   const formRef = useRef<HTMLFormElement>(null)
   const [content, setContent] = useState(blog?.content ?? "")
+  const [imageUrl, setImageUrl] = useState<string | null>(blog?.image ?? null)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
@@ -26,6 +28,7 @@ export function BlogForm({ blog }: BlogFormProps) {
 
     const formData = new FormData(e.currentTarget)
     formData.set("content", content)
+    formData.set("image", imageUrl ?? "")
 
     startTransition(async () => {
       try {
@@ -70,13 +73,8 @@ export function BlogForm({ blog }: BlogFormProps) {
       </div>
 
       <div className="grid gap-2">
-        <Label htmlFor="image">Cover Image URL</Label>
-        <Input
-          id="image"
-          name="image"
-          defaultValue={blog?.image ?? ""}
-          placeholder="https://example.com/image.jpg"
-        />
+        <Label>Cover Image</Label>
+        <ImageUpload value={imageUrl} onChange={setImageUrl} />
       </div>
 
       <div className="grid gap-2">
