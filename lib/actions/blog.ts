@@ -17,15 +17,55 @@ function generateSlug(title: string): string {
   return `${base}-${suffix}`
 }
 
-export async function getBlogs(): Promise<Blog[]> {
+async function requireUser() {
   const supabase = await createClient()
+  const { data, error } = await supabase.auth.getUser()
+  if (error || !data.user) throw new Error("Not authenticated")
+  return { supabase, user: data.user }
+}
+
+function readBlogFields(formData: FormData) {
+  const title = String(formData.get("title") ?? "").trim()
+  if (!title) throw new Error("Title is required")
+
+  const optional = (key: string) => {
+    const value = String(formData.get(key) ?? "").trim()
+    return value || null
+  }
+
+  return {
+    title,
+    subtitle: optional("subtitle"),
+    image: optional("image"),
+    content: optional("content"),
+  }
+}
+
+// Dashboard: only the signed-in author's posts.
+export async function getBlogs(): Promise<Blog[]> {
+  const { supabase, user } = await requireUser()
   const { data, error } = await supabase
     .from("blogs")
     .select("*")
+    .eq("author_id", user.id)
     .order("created_at", { ascending: false })
 
   if (error) throw error
   return data ?? []
+}
+
+// Dashboard: a post by slug, only if the signed-in user wrote it.
+export async function getMyBlogBySlug(slug: string): Promise<Blog | null> {
+  const { supabase, user } = await requireUser()
+  const { data, error } = await supabase
+    .from("blogs")
+    .select("*")
+    .eq("slug", slug)
+    .eq("author_id", user.id)
+    .single()
+
+  if (error) return null
+  return data
 }
 
 export async function getPublicBlogs(): Promise<Blog[]> {
@@ -52,26 +92,23 @@ export async function getBlogBySlug(slug: string): Promise<Blog | null> {
 }
 
 export async function createBlog(formData: FormData) {
-  const supabase = await createClient()
+  const { supabase, user } = await requireUser()
+  const fields = readBlogFields(formData)
+  const slug = generateSlug(fields.title)
 
-  const { data: authData, error: authError } = await supabase.auth.getUser()
-  if (authError || !authData.user) throw new Error("Not authenticated")
-
-  const title = formData.get("title") as string
-  const subtitle = (formData.get("subtitle") as string) || null
-  const image = (formData.get("image") as string) || null
-  const content = (formData.get("content") as string) || null
-
-  const slug = generateSlug(title)
+  // Show a display name on public posts instead of the author's email.
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("first_name")
+    .eq("id", user.id)
+    .single()
+  const author = profile?.first_name?.trim() || "Anonymous"
 
   const { error } = await supabase.from("blogs").insert({
-    title,
+    ...fields,
     slug,
-    subtitle,
-    image,
-    content,
-    author_id: authData.user.id,
-    author: authData.user.email ?? "Unknown",
+    author_id: user.id,
+    author,
   })
 
   if (error) throw error
@@ -82,23 +119,17 @@ export async function createBlog(formData: FormData) {
 }
 
 export async function updateBlog(id: string, formData: FormData) {
-  const supabase = await createClient()
-
-  const title = formData.get("title") as string
-  const subtitle = (formData.get("subtitle") as string) || null
-  const image = (formData.get("image") as string) || null
-  const content = (formData.get("content") as string) || null
+  const { supabase, user } = await requireUser()
+  const fields = readBlogFields(formData)
 
   const { data, error } = await supabase
     .from("blogs")
     .update({
-      title,
-      subtitle,
-      image,
-      content,
+      ...fields,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id)
+    .eq("author_id", user.id)
     .select("slug")
     .single()
 
@@ -110,9 +141,13 @@ export async function updateBlog(id: string, formData: FormData) {
 }
 
 export async function deleteBlog(id: string) {
-  const supabase = await createClient()
+  const { supabase, user } = await requireUser()
 
-  const { error } = await supabase.from("blogs").delete().eq("id", id)
+  const { error } = await supabase
+    .from("blogs")
+    .delete()
+    .eq("id", id)
+    .eq("author_id", user.id)
 
   if (error) throw error
 

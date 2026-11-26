@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { BlogForm } from "@/components/blog-form"
-import { getBlogBySlug } from "@/lib/actions/blog"
+import { getMyBlogBySlug } from "@/lib/actions/blog"
 
 interface EditBlogPageProps {
   params: Promise<{ slug: string }>
@@ -12,7 +12,7 @@ interface EditBlogPageProps {
 
 export default async function EditBlogPage({ params }: EditBlogPageProps) {
   const { slug } = await params
-  const blog = await getBlogBySlug(slug)
+  const blog = await getMyBlogBySlug(slug)
 
   if (!blog) notFound()
 
