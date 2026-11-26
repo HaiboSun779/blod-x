@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { getBlogBySlug, deleteBlog } from "@/lib/actions/blog"
+import { getMyBlogBySlug, deleteBlog } from "@/lib/actions/blog"
 
 interface BlogDetailPageProps {
   params: Promise<{ slug: string }>
@@ -11,7 +11,7 @@ interface BlogDetailPageProps {
 
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const { slug } = await params
-  const blog = await getBlogBySlug(slug)
+  const blog = await getMyBlogBySlug(slug)
 
   if (!blog) notFound()
 
