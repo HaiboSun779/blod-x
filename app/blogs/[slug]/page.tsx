@@ -5,6 +5,7 @@ import { ArrowLeft, Calendar } from "lucide-react"
 import { SiteHeader } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { getBlogBySlug } from "@/lib/actions/blog"
+import { sanitizePostHtml } from "@/lib/sanitize"
 
 interface PublicBlogPageProps {
   params: Promise<{ slug: string }>
@@ -68,7 +69,7 @@ export default async function PublicBlogPage({ params }: PublicBlogPageProps) {
         {/* Article body */}
         <article
           className="prose prose-lg dark:prose-invert mt-10 max-w-none"
-          dangerouslySetInnerHTML={{ __html: blog.content ?? "" }}
+          dangerouslySetInnerHTML={{ __html: sanitizePostHtml(blog.content) }}
         />
 
         {/* Footer divider */}

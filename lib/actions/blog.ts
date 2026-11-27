@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
 import { createClient } from "@/lib/supabase/server"
+import { sanitizeImageUrl, sanitizePostHtml } from "@/lib/sanitize"
 import type { Blog } from "@/types"
 
 function generateSlug(title: string): string {
@@ -36,8 +37,8 @@ function readBlogFields(formData: FormData) {
   return {
     title,
     subtitle: optional("subtitle"),
-    image: optional("image"),
-    content: optional("content"),
+    image: sanitizeImageUrl(optional("image")),
+    content: sanitizePostHtml(optional("content")) || null,
   }
 }
 

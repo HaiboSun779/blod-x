@@ -44,13 +44,15 @@ export function Hero() {
               <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
             </Button>
           </Link>
-          <Button
-            variant="outline"
-            size="lg"
-            className="h-14 px-8 text-base font-semibold"
-          >
-            View Examples
-          </Button>
+          <Link href="/blogs">
+            <Button
+              variant="outline"
+              size="lg"
+              className="h-14 px-8 text-base font-semibold"
+            >
+              View Examples
+            </Button>
+          </Link>
         </div>
 
         {/* Stats */}
