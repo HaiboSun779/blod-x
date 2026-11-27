@@ -4,6 +4,7 @@ import { ArrowLeft, Pencil, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { getMyBlogBySlug, deleteBlog } from "@/lib/actions/blog"
+import { sanitizePostHtml } from "@/lib/sanitize"
 
 interface BlogDetailPageProps {
   params: Promise<{ slug: string }>
@@ -70,7 +71,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
       <article
         className="prose prose-sm dark:prose-invert max-w-none"
-        dangerouslySetInnerHTML={{ __html: blog.content ?? "" }}
+        dangerouslySetInnerHTML={{ __html: sanitizePostHtml(blog.content) }}
       />
     </div>
   )

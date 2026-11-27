@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 
 import { createClient } from "@/lib/supabase/server"
+import { updateProfile } from "@/lib/actions/profile"
 import {
   Card,
   CardContent,
@@ -14,7 +15,12 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { LogoutButton } from "@/components/logout-button"
 
-export default async function AccountPage() {
+interface AccountPageProps {
+  searchParams: Promise<{ saved?: string; error?: string }>
+}
+
+export default async function AccountPage({ searchParams }: AccountPageProps) {
+  const { saved, error: formError } = await searchParams
   const supabase = await createClient()
   const { data, error } = await supabase.auth.getClaims()
 
@@ -23,6 +29,12 @@ export default async function AccountPage() {
   }
 
   const email = data.claims.email as string
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("first_name, avatar_url")
+    .eq("id", data.claims.sub)
+    .single()
 
   return (
     <div className="space-y-6">
@@ -37,23 +49,45 @@ export default async function AccountPage() {
         <CardHeader>
           <CardTitle>Profile</CardTitle>
           <CardDescription>
-            Update your personal information.
+            Your first name is shown as the author on your posts.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" defaultValue={email} disabled />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="first-name">First Name</Label>
-            <Input id="first-name" placeholder="Enter your first name" />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="avatar-url">Avatar URL</Label>
-            <Input id="avatar-url" placeholder="https://example.com/avatar.jpg" />
-          </div>
-          <Button>Update Profile</Button>
+        <CardContent>
+          <form action={updateProfile} className="space-y-4">
+            {saved && (
+              <p className="rounded-md bg-muted p-3 text-sm">Profile saved.</p>
+            )}
+            {formError && (
+              <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                {formError}
+              </p>
+            )}
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" defaultValue={email} disabled />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="first-name">First Name</Label>
+              <Input
+                id="first-name"
+                name="first_name"
+                maxLength={50}
+                defaultValue={profile?.first_name ?? ""}
+                placeholder="Enter your first name"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="avatar-url">Avatar URL</Label>
+              <Input
+                id="avatar-url"
+                name="avatar_url"
+                type="url"
+                defaultValue={profile?.avatar_url ?? ""}
+                placeholder="https://example.com/avatar.jpg"
+              />
+            </div>
+            <Button type="submit">Update Profile</Button>
+          </form>
         </CardContent>
       </Card>
 

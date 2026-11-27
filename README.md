@@ -68,7 +68,7 @@ Access control is enforced in the database with **Row Level Security**, not only
 ```bash
 git clone https://github.com/HaiboSun779/blog-x.git
 cd blog-x
-npm install
+pnpm install
 ```
 
 Create `.env.local`:
@@ -88,7 +88,7 @@ npx supabase db push
 Start the dev server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Then open http://localhost:3000.

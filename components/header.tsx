@@ -1,7 +1,12 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { createClient } from "@/lib/supabase/server"
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const supabase = await createClient()
+  const { data } = await supabase.auth.getClaims()
+  const signedIn = !!data?.claims
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-14 w-full max-w-[960px] items-center justify-between px-4">
@@ -25,18 +30,6 @@ export function SiteHeader() {
 
         <nav className="hidden items-center gap-8 md:flex">
           <Link
-            href="#features"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Features
-          </Link>
-          <Link
-            href="#pricing"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Pricing
-          </Link>
-          <Link
             href="/blogs"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
@@ -45,17 +38,27 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <Link
-            href="/auth/login"
-            className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:block"
-          >
-            Log in
-          </Link>
-          <Link href="/auth/sign-up">
-            <Button size="sm" className="h-9 rounded-full px-4">
-              Get Started
-            </Button>
-          </Link>
+          {signedIn ? (
+            <Link href="/dashboard">
+              <Button size="sm" className="h-9 rounded-full px-4">
+                Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/auth/login"
+                className="hidden text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:block"
+              >
+                Log in
+              </Link>
+              <Link href="/auth/sign-up">
+                <Button size="sm" className="h-9 rounded-full px-4">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
